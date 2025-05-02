@@ -1,39 +1,47 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Registrar Novo Usuário</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="form-field">
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span class="error">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div class="form-field">
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
-            {% for error in form.email.errors %}
-            <span class="error">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div class="form-field">
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span class="error">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div class="form-field">
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
-            <span class="error">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div>{{ form.submit() }}</div>
-    </form>
-    <p>Já tem uma conta? <a href="{{ url_for(\'auth.login\') }}">Clique para entrar!</a></p>
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Criar Conta no BudgetApp</h2>
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-4">
+                {{ form.username.label(class_="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.username(class_="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", size=32) }}
+                {% for error in form.username.errors %}
+                <p class="text-red-500 text-xs italic mt-1">[{{ error }}]</p>
+                {% endfor %}
+            </div>
+            <div class="mb-4">
+                {{ form.email.label(class_="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.email(class_="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", size=32) }}
+                {% for error in form.email.errors %}
+                <p class="text-red-500 text-xs italic mt-1">[{{ error }}]</p>
+                {% endfor %}
+            </div>
+            <div class="mb-4">
+                {{ form.password.label(class_="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.password(class_="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", size=32) }}
+                {% for error in form.password.errors %}
+                <p class="text-red-500 text-xs italic mt-1">[{{ error }}]</p>
+                {% endfor %}
+            </div>
+            <div class="mb-6">
+                {{ form.password2.label(class_="block text-gray-700 text-sm font-bold mb-2") }}
+                {{ form.password2(class_="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline", size=32) }}
+                {% for error in form.password2.errors %}
+                <p class="text-red-500 text-xs italic mt-1">[{{ error }}]</p>
+                {% endfor %}
+            </div>
+            <div class="mb-4">
+                {{ form.submit(class_="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline") }}
+            </div>
+        </form>
+        <p class="text-center text-gray-500 text-xs">
+            Já tem uma conta? <a class="text-indigo-600 hover:text-indigo-800 font-bold" href="{{ url_for(\'auth.login\') }}">Faça login!</a>
+        </p>
+    </div>
+</div>
 {% endblock %}
 

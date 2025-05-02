@@ -1,0 +1,27 @@
+{
+  "name": "budgetapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://lealflavio: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@github.com/lealflavio/BudgetApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lealflavio/BudgetApp/issues"
+  },
+  "homepage": "https://github.com/lealflavio/BudgetApp#readme",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.5",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.1.5"
+  }
+}
