@@ -1,6 +1,6 @@
-# Guia de Configuração do Ambiente para Agentes - Projeto BudgetApp
+# Guia de Configuração e Fluxo de Trabalho para Agentes - Projeto BudgetApp
 
-Este guia descreve os passos necessários para que um novo agente configure seu ambiente de desenvolvimento para contribuir com o projeto BudgetApp.
+Este guia descreve os passos necessários para configurar o ambiente e o fluxo de trabalho atualizado para contribuir com o projeto BudgetApp.
 
 ## Pré-requisitos
 
@@ -9,7 +9,7 @@ Este guia descreve os passos necessários para que um novo agente configure seu 
 
 ## 1. Configuração Inicial do Git
 
-Antes de clonar o repositório, configure seu nome de usuário e email globalmente no Git. Use um nome genérico para o agente.
+Configure seu nome de usuário e email globalmente no Git. Use um nome genérico.
 
 ```bash
 git config --global user.name "BudgetApp Agent"
@@ -18,79 +18,83 @@ git config --global user.email "agent@budgetapp.example.com"
 
 ## 2. Obter Token de Acesso (PAT)
 
-Para poder enviar (push) suas alterações de código, você precisa de um token de acesso pessoal (PAT) do GitHub. **Este token é sensível e não deve ser compartilhado publicamente ou incluído em commits.**
+Para poder enviar (push) suas alterações, você precisa de um token de acesso pessoal (PAT) do GitHub. **Este token é sensível.**
 
-*   **Solicite o token de acesso pessoal (PAT) atualizado ao gerente do projeto (Dione).**
-*   **NÃO** inclua o token diretamente em nenhum arquivo versionado.
+*   **Solicite o token PAT atualizado ao gerente do projeto (Dione).**
+*   **NÃO** inclua o token em nenhum arquivo versionado.
 
-## 3. Clonar o Repositório
+## 3. Clonar ou Atualizar o Repositório
 
-Clone o repositório do projeto usando a URL que inclui o token de acesso pessoal (PAT) para autenticação. Substitua `<SEU_TOKEN_PAT>` pelo token fornecido por Dione.
+Use a URL com o token para clonar ou atualizar o repositório. Substitua `<SEU_TOKEN_PAT>` pelo token fornecido por Dione.
 
-**Credenciais:**
-*   **Usuário GitHub:** `lealflavio`
+**Usuário GitHub:** `lealflavio`
 
-**Comando para Clonar:**
+**Comando para Clonar (se for a primeira vez):**
 
 ```bash
-# Navegue para o diretório onde deseja clonar o projeto (ex: /home/ubuntu)
 cd /home/ubuntu
-
-# Clone usando a URL com o token (substitua <SEU_TOKEN_PAT> pelo token fornecido por Dione)
 git clone https://lealflavio:<SEU_TOKEN_PAT>@github.com/lealflavio/BudgetApp.git
-
-# Entre no diretório do projeto
 cd BudgetApp
 ```
 
-**Alternativa (Configuração Remota):** Se você já clonou o repositório anteriormente, pode atualizar a URL remota para usar o novo token:
+**Comando para Atualizar URL Remota (se já clonou antes):**
 
 ```bash
 cd /home/ubuntu/BudgetApp
-# Substitua <SEU_TOKEN_PAT> pelo token fornecido por Dione
 git remote set-url origin https://lealflavio:<SEU_TOKEN_PAT>@github.com/lealflavio/BudgetApp.git
 ```
 
-**Importante:** Trate o token de acesso (PAT) como uma senha.
-
-## 4. Configurar Ambiente Virtual (Opcional, mas Recomendado)
+## 4. Configurar Ambiente Virtual (Recomendado)
 
 ```bash
-# Dentro do diretório /home/ubuntu/BudgetApp
+# Dentro de /home/ubuntu/BudgetApp
 python3.11 -m venv venv
 source venv/bin/activate
-
-# Instale as dependências
 pip install -r requirements.txt
-
-# Para desativar o ambiente virtual quando terminar:
-# deactivate
+# Para desativar: deactivate
 ```
 
-## 5. Verificar Configuração
+## 5. Fluxo de Trabalho de Desenvolvimento e Conclusão de Tarefas
 
-Verifique se você consegue se comunicar com o repositório remoto:
+Siga estes passos para cada tarefa (Issue):
 
-```bash
-git status
-git remote -v
-# Deve mostrar o 'origin' apontando para a URL do GitHub com seu token
-```
+1.  **Identificar Tarefa:**
+    *   Acesse as Issues: [https://github.com/lealflavio/BudgetApp/issues](https://github.com/lealflavio/BudgetApp/issues)
+    *   Use a barra de busca para filtrar pelo seu nome (ex: `[Orfeu]`).
+    *   Se não houver Issues abertas com seu nome, informe Dione.
+2.  **Sincronizar e Criar Branch:**
+    *   Certifique-se de estar no branch `develop` e que ele esteja atualizado:
+        ```bash
+        git checkout develop
+        git pull origin develop
+        ```
+    *   Crie um branch para sua tarefa (substitua `X.Y` pelo número da Issue e `descricao-curta` por algo relevante):
+        ```bash
+        git checkout -b feature/issueX.Y-descricao-curta
+        # Ex: git checkout -b feature/issue7-setup-lint-format
+        ```
+3.  **Desenvolver e Commitar:**
+    *   Implemente a funcionalidade ou correção descrita na Issue.
+    *   Faça commits pequenos e descritivos (`git add .`, `git commit -m "feat: Descrição da mudança"`). Consulte `CONTRIBUTING.md` para padrões de commit.
+4.  **Enviar Alterações (Push):**
+    *   Envie seu branch para o repositório remoto:
+        ```bash
+        git push origin feature/issueX.Y-descricao-curta
+        ```
+5.  **Notificar Conclusão a Dione (IMPORTANTE):**
+    *   **Este é o passo crucial para "concluir a tarefa" no fluxo atual.**
+    *   Envie uma mensagem para Dione informando:
+        *   O número da Issue que você concluiu (ex: Issue #7).
+        *   O nome exato do branch que você enviou (ex: `feature/issue7-setup-lint-format`).
+    *   **Por quê?** Devido às limitações de autenticação nos ambientes dos agentes, vocês não conseguem interagir diretamente com a interface do GitHub para criar Pull Requests ou fechar Issues. Dione precisa ser notificado para realizar essas ações por vocês.
+6.  **Ações de Dione (Gerente):**
+    *   Após sua notificação, Dione irá:
+        *   Criar o Pull Request do seu branch para o `develop`.
+        *   Revisar o código (ou designar revisores).
+        *   **Fechar a Issue correspondente no GitHub.**
+        *   Fazer o merge do PR após aprovação.
+7.  **Acompanhar Revisão:**
+    *   Fique atento ao Pull Request criado por Dione para responder a possíveis comentários ou solicitações de alteração durante a revisão.
 
-## 6. Próximos Passos: Pegando sua Primeira Tarefa e Fluxo de Trabalho Atualizado
-
-Seu ambiente está configurado! Agora, siga estes passos para obter sua tarefa e contribuir:
-
-1.  **Verifique as Issues Atribuídas:** Acesse a seção de Issues do repositório no GitHub: [https://github.com/lealflavio/BudgetApp/issues](https://github.com/lealflavio/BudgetApp/issues).
-2.  **Consulte as Tarefas Iniciais:** Se nenhuma Issue estiver atribuída, consulte `INITIAL_TASKS.md`.
-3.  **Comunique-se para Atribuição:** Peça a Dione (Gerente) para atribuir uma Issue a você.
-4.  **Siga o Fluxo de Trabalho Modificado:**
-    *   Sincronize e crie seu branch `feature/...` ou `bugfix/...` a partir do `develop`.
-    *   Desenvolva e faça commits regulares.
-    *   Faça push do seu branch (`git push origin feature/...`).
-    *   **Notifique Dione:** Informe que concluiu e fez push do branch.
-    *   **Dione Criará o Pull Request:** Dione criará o PR para o `develop`.
-    *   **Acompanhe a Revisão:** Acompanhe o PR criado por Dione.
-
-Consulte `CONTRIBUTING.md` para detalhes sobre branches e commits. A principal mudança é que **Dione criará os Pull Requests**.
+**Resumo da Mudança:** O desenvolvimento e push são feitos por vocês. A notificação a Dione é essencial. Dione cuida da criação do PR e fechamento da Issue no GitHub.
 
