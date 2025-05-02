@@ -9,7 +9,7 @@ from src.extensions import db
 from src.models.category import Category
 
 # Create the blueprint
-categories_bp = Blueprint("categories", __name__, template_folder="../static")
+categories_bp = Blueprint("categories", __name__, template_folder="../templates")
 
 # --- Forms ---
 class CategoryForm(FlaskForm):
@@ -68,10 +68,8 @@ def add_category():
             flash("Categoria adicionada com sucesso!")
             return redirect(url_for("categories.list_categories")) # Redirect to list view
 
-    # Render a template with the form (to be created)
-    # return render_template("add_category.html", title="Adicionar Categoria", form=form)
-    # Temporary response
-    return jsonify({"message": "GET request to add_category. Use POST to submit form."})
+    # Render a template with the form
+    return render_template("category_form.html", title="Adicionar Categoria", form=form)
 
 @categories_bp.route("/categories/edit/<int:category_id>", methods=["GET", "POST"])
 @login_required
@@ -102,10 +100,8 @@ def edit_category(category_id):
             flash("Categoria atualizada com sucesso!")
             return redirect(url_for("categories.list_categories"))
 
-    # Render a template with the form (to be created)
-    # return render_template("edit_category.html", title="Editar Categoria", form=form, category_id=category_id)
-    # Temporary response
-    return jsonify({"message": f"GET request to edit_category {category_id}. Use POST to submit form."})
+    # Render a template with the form
+    return render_template("category_form.html", title="Editar Categoria", form=form, category_id=category_id)
 
 @categories_bp.route("/categories/delete/<int:category_id>", methods=["POST"]) # Use POST for deletion
 @login_required

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - BudgetApp{% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    <form method="post" action="">
+        {{ form.hidden_tag() }} <!-- Inclui CSRF token -->
+
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(size=30) }}<br>
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.type.label }}<br>
+            {{ form.type() }}<br>
+            {% for error in form.type.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.icon.label }}<br>
+            {{ form.icon(size=30) }}<br>
+            {% for error in form.icon.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }} <a href="{{ url_for("categories.list_categories") }}">Cancelar</a></p>
+    </form>
+
+    <style>
+        form p label { display: block; font-weight: bold; margin-bottom: 5px; }
+        form p input[type="text"], form p select { width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        form p input[type="submit"] { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        form p input[type="submit"]:hover { background-color: #218838; }
+        form p a { margin-left: 10px; color: #6c757d; text-decoration: none; }
+        form p a:hover { text-decoration: underline; }
+    </style>
+{% endblock %}
+
