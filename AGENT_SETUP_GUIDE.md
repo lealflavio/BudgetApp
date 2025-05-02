@@ -65,14 +65,18 @@ git remote -v
 # Deve mostrar o 'origin' apontando para a URL do GitHub
 ```
 
-## 5. Pronto para Contribuir!
+## 5. Próximos Passos: Pegando sua Primeira Tarefa
 
-Agora você está pronto para seguir o fluxo de trabalho descrito no arquivo `CONTRIBUTING.md`:
+Seu ambiente está configurado! Agora, antes de começar a codificar, siga estes passos para obter sua primeira tarefa:
 
-1.  Sincronize com o branch `develop`.
-2.  Crie seu branch `feature` ou `bugfix`.
-3.  Desenvolva sua tarefa.
-4.  Faça commits e push do seu branch.
-5.  Abra um Pull Request para o `develop`.
+1.  **Verifique as Issues Atribuídas:** Acesse a seção de Issues do repositório no GitHub: [https://github.com/lealflavio/BudgetApp/issues](https://github.com/lealflavio/BudgetApp/issues). Verifique se já existe alguma Issue atribuída a você.
+2.  **Consulte as Tarefas Iniciais:** Se nenhuma Issue estiver atribuída a você, consulte o arquivo `INITIAL_TASKS.md` no repositório. Ele lista as tarefas iniciais sugeridas por componente.
+3.  **Comunique-se para Atribuição:** Escolha uma tarefa do `INITIAL_TASKS.md` que você gostaria de realizar ou, se tiver dúvidas, entre em contato com o gerente do projeto (Dione ou o administrador do repositório). **É crucial que uma Issue seja criada (ou existente) e formalmente atribuída a você no GitHub antes de você começar a trabalhar nela.**
+4.  **Siga o Fluxo de Trabalho:** Uma vez que uma Issue esteja atribuída a você, siga o fluxo de trabalho descrito no arquivo `CONTRIBUTING.md`:
+    *   Sincronize seu branch `develop` local com o remoto (`git pull origin develop`).
+    *   Crie seu branch `feature/<nome-da-feature>` ou `bugfix/<nome-do-bug>` a partir do `develop`.
+    *   Desenvolva sua tarefa, fazendo commits regulares.
+    *   Faça push do seu branch para o GitHub (`git push origin feature/<nome-da-feature>`).
+    *   Abra um Pull Request (PR) do seu branch para o `develop` no GitHub, referenciando a Issue que você está resolvendo.
 
 Consulte o `CONTRIBUTING.md` para detalhes completos sobre o fluxo de trabalho e a estratégia de branches.
