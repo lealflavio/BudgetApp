@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block title %}Minhas Categorias - BudgetApp{% endblock %}
+
+{% block content %}
+    <h1>Minhas Categorias</h1>
+
+    <p>
+        <a href="{{ url_for("categories.add_category") }}">Adicionar Nova Categoria</a>
+        <!-- Este link aponta para a rota de adicionar categoria, que precisará de seu próprio template -->
+    </p>
+
+    <h2>Categorias de Despesa</h2>
+    {% set expense_categories = categories | selectattr("type", "equalto", "Despesa") | list %}
+    {% if expense_categories %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Padrão?</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in expense_categories %}
+                    <tr>
+                        <td>{{ category.icon }} {{ category.name }}</td>
+                        <td>{{ category.type }}</td>
+                        <td>{% if category.is_default %}Sim{% else %}Não{% endif %}</td>
+                        <td>
+                            {% if not category.is_default %}
+                                <a href="{{ url_for("categories.edit_category", category_id=category.id) }}">Editar</a>
+                                <form action="{{ url_for("categories.delete_category", category_id=category.id) }}" method="post" style="display: inline;">
+                                    <input type="submit" value="Excluir" onclick="return confirm("Tem certeza que deseja excluir esta categoria? Verifique se não há transações associadas.");">
+                                </form>
+                            {% else %}
+                                (Padrão)
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma categoria de despesa encontrada.</p>
+    {% endif %}
+
+    <h2>Categorias de Receita</h2>
+    {% set income_categories = categories | selectattr("type", "equalto", "Receita") | list %}
+    {% if income_categories %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Padrão?</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in income_categories %}
+                    <tr>
+                        <td>{{ category.icon }} {{ category.name }}</td>
+                        <td>{{ category.type }}</td>
+                        <td>{% if category.is_default %}Sim{% else %}Não{% endif %}</td>
+                        <td>
+                            {% if not category.is_default %}
+                                <a href="{{ url_for("categories.edit_category", category_id=category.id) }}">Editar</a>
+                                <form action="{{ url_for("categories.delete_category", category_id=category.id) }}" method="post" style="display: inline;">
+                                    <input type="submit" value="Excluir" onclick="return confirm("Tem certeza que deseja excluir esta categoria? Verifique se não há transações associadas.");">
+                                </form>
+                            {% else %}
+                                (Padrão)
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma categoria de receita encontrada.</p>
+    {% endif %}
+
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 30px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        input[type="submit"] { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
+        input[type="submit"]:hover { text-decoration: underline; }
+        h2 { margin-top: 30px; }
+    </style>
+{% endblock %}
+

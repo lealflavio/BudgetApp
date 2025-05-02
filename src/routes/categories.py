@@ -9,7 +9,7 @@ from src.extensions import db
 from src.models.category import Category
 
 # Create the blueprint
-categories_bp = Blueprint("categories", __name__, template_folder="../static")
+categories_bp = Blueprint("categories", __name__, template_folder="../templates")
 
 # --- Forms ---
 class CategoryForm(FlaskForm):
@@ -32,14 +32,7 @@ def list_categories():
         (Category.user_id == current_user.id) | (Category.is_default == True)
     ).order_by(Category.type, Category.name).all()
 
-    # For now, returning JSON, will integrate with template later
-    return jsonify([{
-        "id": cat.id,
-        "name": cat.name,
-        "type": cat.type,
-        "is_default": cat.is_default,
-        "user_id": cat.user_id
-    } for cat in user_categories])
+    return render_template("categories_list.html", categories=user_categories, title="Minhas Categorias")
 
 @categories_bp.route("/categories/add", methods=["GET", "POST"])
 @login_required
