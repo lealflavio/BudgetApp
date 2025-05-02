@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ title }} - Orçamento App</title>
+    <!-- Adicionar links para CSS aqui (ex: Bootstrap ou CSS customizado) -->
+    <link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/style.css\') }}">
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .flash { background: #cee5f5; padding: 10px; border: 1px solid #aacbe2; margin-bottom: 15px; }
+        nav a { margin-right: 15px; }
+        .form-field { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type=\'text\'], input[type=\'password\'], input[type=\'email\'] { width: 300px; padding: 8px; box-sizing: border-box; }
+        .error { color: red; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for(\'index\') }}">Início</a>
+        {% if current_user.is_anonymous %}
+        <a href="{{ url_for(\'auth.login\') }}">Entrar</a>
+        <a href="{{ url_for(\'auth.register\') }}">Registrar</a>
+        {% else %}
+        <span>Olá, {{ current_user.username }}!</span>
+        <a href="{{ url_for(\'auth.logout\') }}">Sair</a>
+        <!-- Adicionar outros links de navegação aqui (Contas, Categorias, etc.) -->
+        {% endif %}
+    </nav>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=\'flash\'>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+
+    <!-- Adicionar links para JS aqui -->
+</body>
+</html>
+

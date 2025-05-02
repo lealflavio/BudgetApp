@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Registrar Novo Usuário</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-field">
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-field">
+            {{ form.email.label }}<br>
+            {{ form.email(size=32) }}<br>
+            {% for error in form.email.errors %}
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-field">
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}<br>
+            {% for error in form.password.errors %}
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-field">
+            {{ form.password2.label }}<br>
+            {{ form.password2(size=32) }}<br>
+            {% for error in form.password2.errors %}
+            <span class="error">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>{{ form.submit() }}</div>
+    </form>
+    <p>Já tem uma conta? <a href="{{ url_for(\'auth.login\') }}">Clique para entrar!</a></p>
+{% endblock %}
+
