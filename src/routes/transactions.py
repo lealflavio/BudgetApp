@@ -13,7 +13,7 @@ from src.models.account import Account
 from src.models.category import Category
 
 # Create the blueprint
-transactions_bp = Blueprint("transactions", __name__, template_folder="../static")
+transactions_bp = Blueprint("transactions", __name__, template_folder="../templates")
 
 # --- Helper Functions for Form Choices ---
 def get_user_accounts():
@@ -50,16 +50,7 @@ def list_transactions():
     # Add filtering based on request args later (period, account, category, type)
     user_transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date.desc()).all()
 
-    # For now, returning JSON, will integrate with template later
-    return jsonify([{
-        "id": t.id,
-        "date": t.date.isoformat(),
-        "description": t.description,
-        "amount": str(t.amount),
-        "type": t.type,
-        "account": t.account.name,
-        "category": t.category.name
-    } for t in user_transactions])
+    return render_template("transactions_list.html", transactions=user_transactions, title="Minhas Transações")
 
 # Route to dynamically get categories based on type for the form
 @transactions_bp.route("/_get_categories/<transaction_type>")

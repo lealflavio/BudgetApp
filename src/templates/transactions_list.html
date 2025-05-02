@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Minhas Transações - BudgetApp{% endblock %}
+
+{% block content %}
+    <h1>Minhas Transações</h1>
+
+    <p>
+        <a href="{{ url_for("transactions.add_transaction") }}">Adicionar Nova Transação</a>
+        <!-- TODO: Add filtering options here (date range, account, category, type) -->
+    </p>
+
+    {% if transactions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Tipo</th>
+                    <th>Conta</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                    <tr class="{% if t.type == "Receita" %}income{% else %}expense{% endif %}">
+                        <td>{{ t.date.strftime("%d/%m/%Y") }}</td>
+                        <td>{{ t.description or "-" }}</td>
+                        <td>R$ {{ "%.2f"|format(t.amount)|replace(".", ",") }}</td>
+                        <td>{{ t.type }}</td>
+                        <td>{{ t.account.name }}</td>
+                        <td>{{ t.category.icon }} {{ t.category.name }}</td>
+                        <td>
+                            {% if t.type == "Despesa" %}
+                                {% if t.is_paid %}Pago{% else %}Não Pago{% endif %}
+                            {% elif t.type == "Receita" %}
+                                {% if t.is_received %}Recebido{% else %}Não Recebido{% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for("transactions.edit_transaction", transaction_id=t.id) }}">Editar</a>
+                            <form action="{{ url_for("transactions.delete_transaction", transaction_id=t.id) }}" method="post" style="display: inline;">
+                                <input type="submit" value="Excluir" onclick="return confirm("Tem certeza que deseja excluir esta transação?");">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma transação encontrada.</p>
+    {% endif %}
+
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr.income td:nth-child(3) { color: green; }
+        tr.expense td:nth-child(3) { color: red; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        input[type="submit"] { background: none; border: none; color: #dc3545; cursor: pointer; padding: 0; font-size: inherit; }
+        input[type="submit"]:hover { text-decoration: underline; }
+    </style>
+{% endblock %}
+
