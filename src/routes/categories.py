@@ -1,130 +1,178 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_required
-from wtforms import StringField, SelectField, BooleanField, SubmitField
-from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Length, Optional
 
 from src.extensions import db
 from src.models.category import Category
 
 # Create the blueprint
-categories_bp = Blueprint("categories", __name__, template_folder="../static")
+categories_bp = Blueprint("categories", __name__)
 
-# --- Forms ---
-class CategoryForm(FlaskForm):
-    name = StringField("Nome da Categoria", validators=[DataRequired(), Length(max=100)])
-    type = SelectField("Tipo", choices=[
-        ("Despesa", "Despesa"),
-        ("Receita", "Receita")
-    ], validators=[DataRequired()])
-    icon = StringField("Ícone (Opcional)", validators=[Optional(), Length(max=50)])
-    # is_default is handled internally, not by user form
-    submit = SubmitField("Salvar Categoria")
+# --- Helper Function ---
+def category_to_dict(category):
+    """Converts a Category object to a dictionary for JSON serialization."""
+    return {
+        "id": category.id,
+        "user_id": category.user_id, # Can be None for default categories
+        "name": category.name,
+        "type": category.type, # "Receita" or "Despesa"
+        "icon": category.icon,
+        "is_default": category.is_default,
+        "created_at": category.created_at.isoformat() # Use ISO format for datetime
+    }
 
 # --- Routes ---
-@categories_bp.route("/categories")
+@categories_bp.route("/categories", methods=["GET"])
 @login_required
 def list_categories():
-    """List all default categories and categories for the current user."""
-    # Query default categories (user_id is None) and user-specific categories
-    user_categories = Category.query.filter(
-        (Category.user_id == current_user.id) | (Category.is_default == True)
-    ).order_by(Category.type, Category.name).all()
+    """API endpoint to list all default categories and categories for the current user."""
+    try:
+        # Query default categories (is_default == True) and user-specific categories
+        user_and_default_categories = Category.query.filter(
+            (Category.user_id == current_user.id) | (Category.is_default == True)
+        ).order_by(Category.type, Category.name).all()
+        return jsonify([category_to_dict(cat) for cat in user_and_default_categories]), 200
+    except Exception as e:
+        # Log the error e
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
-    # For now, returning JSON, will integrate with template later
-    return jsonify([{
-        "id": cat.id,
-        "name": cat.name,
-        "type": cat.type,
-        "is_default": cat.is_default,
-        "user_id": cat.user_id
-    } for cat in user_categories])
+@categories_bp.route("/categories/<int:category_id>", methods=["GET"])
+@login_required
+def get_category(category_id):
+    """API endpoint to get a specific category by ID."""
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            return jsonify({"error": "Category not found"}), 404
+        # Allow access if it's a default category or belongs to the user
+        if not category.is_default and category.user_id != current_user.id:
+            return jsonify({"error": "Unauthorized access"}), 403
+        return jsonify(category_to_dict(category)), 200
+    except Exception as e:
+        # Log the error e
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
-@categories_bp.route("/categories/add", methods=["GET", "POST"])
+@categories_bp.route("/categories", methods=["POST"])
 @login_required
 def add_category():
-    """Add a new custom category for the current user."""
-    form = CategoryForm()
-    if form.validate_on_submit():
+    """API endpoint to add a new custom category for the current user."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input, JSON required"}), 400
+
+    name = data.get("name")
+    category_type = data.get("type")
+    icon = data.get("icon")
+
+    # Basic Validation
+    if not name or not isinstance(name, str) or len(name) > 100:
+        return jsonify({"error": "Invalid or missing 'name'"}), 400
+    if not category_type or category_type not in ["Receita", "Despesa"]:
+        return jsonify({"error": "Invalid or missing 'type'. Must be 'Receita' or 'Despesa'."}), 400
+    if icon and (not isinstance(icon, str) or len(icon) > 50):
+        return jsonify({"error": "Invalid 'icon'"}), 400
+
+    try:
         # Check if category with the same name and type already exists for the user
         existing_category = Category.query.filter_by(
             user_id=current_user.id,
-            name=form.name.data,
-            type=form.type.data
+            name=name,
+            type=category_type
         ).first()
         if existing_category:
-            flash("Você já possui uma categoria com este nome e tipo.")
-        else:
-            new_category = Category(
-                user_id=current_user.id,
-                name=form.name.data,
-                type=form.type.data,
-                icon=form.icon.data,
-                is_default=False # Custom categories are not default
-            )
-            db.session.add(new_category)
-            db.session.commit()
-            flash("Categoria adicionada com sucesso!")
-            return redirect(url_for("categories.list_categories")) # Redirect to list view
+            return jsonify({"error": "A category with this name and type already exists for this user"}), 409 # 409 Conflict
 
-    # Render a template with the form (to be created)
-    # return render_template("add_category.html", title="Adicionar Categoria", form=form)
-    # Temporary response
-    return jsonify({"message": "GET request to add_category. Use POST to submit form."})
+        new_category = Category(
+            user_id=current_user.id,
+            name=name,
+            type=category_type,
+            icon=icon,
+            is_default=False # Custom categories are never default
+        )
+        db.session.add(new_category)
+        db.session.commit()
+        return jsonify(category_to_dict(new_category)), 201 # 201 Created status
+    except Exception as e:
+        db.session.rollback()
+        # Log the error e
+        return jsonify({"error": "Failed to add category"}), 500
 
-@categories_bp.route("/categories/edit/<int:category_id>", methods=["GET", "POST"])
+@categories_bp.route("/categories/<int:category_id>", methods=["PUT"])
 @login_required
-def edit_category(category_id):
-    """Edit an existing custom category."""
-    category = Category.query.get_or_404(category_id)
-    # Ensure the user owns this category and it's not a default one
-    if category.user_id != current_user.id or category.is_default:
-        flash("Acesso não autorizado ou categoria padrão não pode ser editada.")
-        return redirect(url_for("categories.list_categories"))
+def update_category(category_id):
+    """API endpoint to update an existing custom category (full update)."""
+    category = Category.query.get(category_id)
+    if not category:
+        return jsonify({"error": "Category not found"}), 404
+    # Prevent editing default categories or categories not owned by the user
+    if category.is_default or category.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized: Cannot edit default categories or categories owned by others"}), 403
 
-    form = CategoryForm(obj=category) # Pre-populate form
-    if form.validate_on_submit():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input, JSON required"}), 400
+
+    name = data.get("name")
+    category_type = data.get("type")
+    icon = data.get("icon")
+
+    # Basic Validation (similar to POST, ensure all required fields for PUT are present)
+    if not name or not isinstance(name, str) or len(name) > 100:
+        return jsonify({"error": "Invalid or missing 'name'"}), 400
+    if not category_type or category_type not in ["Receita", "Despesa"]:
+        return jsonify({"error": "Invalid or missing 'type'. Must be 'Receita' or 'Despesa'."}), 400
+    if icon and (not isinstance(icon, str) or len(icon) > 50):
+        return jsonify({"error": "Invalid 'icon'"}), 400
+
+    try:
         # Check if changing name/type conflicts with another existing category for the user
         existing_category = Category.query.filter(
-            Category.id != category_id, # Exclude the current category
+            Category.id != category_id, # Exclude the current category being updated
             Category.user_id == current_user.id,
-            Category.name == form.name.data,
-            Category.type == form.type.data
+            Category.name == name,
+            Category.type == category_type
         ).first()
         if existing_category:
-            flash("Você já possui outra categoria com este nome e tipo.")
-        else:
-            category.name = form.name.data
-            category.type = form.type.data
-            category.icon = form.icon.data
-            db.session.commit()
-            flash("Categoria atualizada com sucesso!")
-            return redirect(url_for("categories.list_categories"))
+            return jsonify({"error": "Another category with this name and type already exists for this user"}), 409 # 409 Conflict
 
-    # Render a template with the form (to be created)
-    # return render_template("edit_category.html", title="Editar Categoria", form=form, category_id=category_id)
-    # Temporary response
-    return jsonify({"message": f"GET request to edit_category {category_id}. Use POST to submit form."})
+        category.name = name
+        category.type = category_type
+        category.icon = icon
+        db.session.commit()
+        return jsonify(category_to_dict(category)), 200
+    except Exception as e:
+        db.session.rollback()
+        # Log the error e
+        return jsonify({"error": "Failed to update category"}), 500
 
-@categories_bp.route("/categories/delete/<int:category_id>", methods=["POST"]) # Use POST for deletion
+@categories_bp.route("/categories/<int:category_id>", methods=["DELETE"])
 @login_required
 def delete_category(category_id):
-    """Delete a custom category."""
-    category = Category.query.get_or_404(category_id)
-    # Ensure the user owns this category and it's not a default one
-    if category.user_id != current_user.id or category.is_default:
-        flash("Acesso não autorizado ou categoria padrão não pode ser excluída.")
-        return redirect(url_for("categories.list_categories"))
+    """API endpoint to delete a custom category."""
+    category = Category.query.get(category_id)
+    if not category:
+        return jsonify({"error": "Category not found"}), 404
+    # Prevent deleting default categories or categories not owned by the user
+    if category.is_default or category.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized: Cannot delete default categories or categories owned by others"}), 403
 
-    # Check for associated transactions before deleting (important!)
-    # Need Transaction model and relationship defined first
-    # if category.transactions.count() > 0:
-    #     flash("Não é possível excluir categorias com transações associadas. Reatribua as transações primeiro.")
-    #     return redirect(url_for("categories.list_categories"))
+    # Optional: Check for associated transactions before deleting
+    # from src.models.transaction import Transaction # Import here or globally if needed
+    # if Transaction.query.filter_by(category_id=category_id).first():
+    #     return jsonify({"error": "Cannot delete category with associated transactions"}), 400
 
-    db.session.delete(category)
-    db.session.commit()
-    flash("Categoria excluída com sucesso!")
-    return redirect(url_for("categories.list_categories"))
+    try:
+        db.session.delete(category)
+        db.session.commit()
+        return jsonify({"message": "Category deleted successfully"}), 200 # Or 204 No Content
+    except Exception as e:
+        db.session.rollback()
+        # Log the error e
+        return jsonify({"error": "Failed to delete category"}), 500
+
+# Remove form-based routes or comment them out if needed temporarily
+# class CategoryForm(FlaskForm): ...
+# @categories_bp.route("/categories/add", methods=["GET", "POST"]) ...
+# @categories_bp.route("/categories/edit/<int:category_id>", methods=["GET", "POST"]) ...
+# @categories_bp.route("/categories/delete/<int:category_id>", methods=["POST"]) ...
 
