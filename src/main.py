@@ -4,6 +4,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_login import login_required # Importação adicionada
 from urllib.parse import urlparse
 
 # Import extensions from the dedicated file
@@ -12,7 +13,7 @@ from src.extensions import db, login, migrate
 # DO NOT import forms or models here at the top level
 
 def create_app():
-    app = Flask(__name__, static_folder="static", template_folder="static")
+    app = Flask(__name__, static_folder="static", template_folder="templates")
     app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "you-will-never-guess") # Use environment variable in production
 
     # Configure database

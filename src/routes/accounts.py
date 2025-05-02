@@ -9,7 +9,7 @@ from src.extensions import db
 from src.models.account import Account
 
 # Create the blueprint
-accounts_bp = Blueprint("accounts", __name__, template_folder="../static")
+accounts_bp = Blueprint("accounts", __name__, template_folder="../templates")
 
 # --- Forms ---
 class AccountForm(FlaskForm):
@@ -33,13 +33,7 @@ class AccountForm(FlaskForm):
 def list_accounts():
     """List all accounts for the current user."""
     user_accounts = Account.query.filter_by(user_id=current_user.id).order_by(Account.name).all()
-    # For now, returning JSON, will integrate with template later
-    return jsonify([{
-        "id": acc.id,
-        "name": acc.name,
-        "type": acc.type,
-        "initial_balance": str(acc.initial_balance) # Convert Decimal to string for JSON
-    } for acc in user_accounts])
+    return render_template("accounts_list.html", accounts=user_accounts, title="Minhas Contas")
 
 @accounts_bp.route("/accounts/add", methods=["GET", "POST"])
 @login_required
