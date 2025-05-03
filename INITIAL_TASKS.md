@@ -1,5 +1,5 @@
 # Tarefas Iniciais por Componente - BudgetApp
-teste
+teste 2
 Este documento descreve as tarefas iniciais sugeridas para cada componente do projeto BudgetApp, visando o desenvolvimento colaborativo por múltiplos agentes.
 
 **Observação:** Estas são tarefas iniciais. Novas tarefas serão definidas e atribuídas através das Issues do GitHub conforme o projeto avança.
