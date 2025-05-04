@@ -9,7 +9,7 @@ from src.extensions import db
 from src.models.account import Account
 
 # Create the blueprint
-accounts_bp = Blueprint("accounts", __name__, template_folder="../static")
+accounts_bp = Blueprint("accounts", __name__, template_folder="../templates")
 
 # --- Forms ---
 class AccountForm(FlaskForm):
@@ -58,10 +58,8 @@ def add_account():
         db.session.commit()
         flash("Conta adicionada com sucesso!")
         return redirect(url_for("accounts.list_accounts")) # Redirect to list view for now
-    # Render a template with the form (to be created)
-    # return render_template("add_account.html", title="Adicionar Conta", form=form)
-    # Temporary response
-    return jsonify({"message": "GET request to add_account. Use POST to submit form."})
+    # Render a template with the form
+    return render_template("account_form.html", title="Adicionar Conta", form=form)
 
 @accounts_bp.route("/accounts/edit/<int:account_id>", methods=["GET", "POST"])
 @login_required
@@ -82,10 +80,8 @@ def edit_account(account_id):
         db.session.commit()
         flash("Conta atualizada com sucesso!")
         return redirect(url_for("accounts.list_accounts"))
-    # Render a template with the form (to be created)
-    # return render_template("edit_account.html", title="Editar Conta", form=form, account_id=account_id)
-    # Temporary response
-    return jsonify({"message": f"GET request to edit_account {account_id}. Use POST to submit form."})
+    # Render a template with the form
+    return render_template("account_form.html", title="Editar Conta", form=form, account_id=account_id)
 
 @accounts_bp.route("/accounts/delete/<int:account_id>", methods=["POST"]) # Use POST for deletion
 @login_required
