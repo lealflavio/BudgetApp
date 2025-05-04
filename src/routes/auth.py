@@ -10,8 +10,8 @@ from src.forms import LoginForm, RegistrationForm
 
 # Create the blueprint
 auth_bp = Blueprint(
-    "auth", __name__, template_folder="../static"
-)  # Assuming templates are in static for now
+    "auth", __name__
+)  # Templates are handled by the main app configuration
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
