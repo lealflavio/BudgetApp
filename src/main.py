@@ -5,6 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_login import login_required
 from urllib.parse import urlparse
 
 # Import extensions from the dedicated file

@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, extract
 from datetime import datetime
 
-from src.main import db
+from src.extensions import db
 from src.models.transaction import Transaction
 
 # Create the blueprint
