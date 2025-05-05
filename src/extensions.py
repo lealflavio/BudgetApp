@@ -6,6 +6,5 @@ from flask_migrate import Migrate
 # Initialize extensions globally
 db = SQLAlchemy()
 login = LoginManager()
-login.login_view = "auth.login" # Default route for login
+login.login_view = "auth.login"  # Default route for login
 migrate = Migrate()
-

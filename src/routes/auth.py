@@ -9,12 +9,15 @@ from src.models.user import User
 from src.forms import LoginForm, RegistrationForm
 
 # Create the blueprint
-auth_bp = Blueprint("auth", __name__, template_folder="../static") # Assuming templates are in static for now
+auth_bp = Blueprint(
+    "auth", __name__
+)  # Templates are handled by the main app configuration
+
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("index")) # Redirect if already logged in
+        return redirect(url_for("index"))  # Redirect if already logged in
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -24,18 +27,20 @@ def login():
         login_user(user, remember=form.remember_me.data)
         # Redirect to the page the user was trying to access, or index
         next_page = request.args.get("next")
-        if not next_page or url_parse(next_page).netloc != "":
+        if not next_page or urlparse(next_page).netloc != "":
             next_page = url_for("index")
         flash(f"Login bem-sucedido! Bem-vindo, {user.username}!")
         return redirect(next_page)
     # Render the login template (assuming it exists in static/)
     return render_template("login.html", title="Entrar", form=form)
 
+
 @auth_bp.route("/logout")
 def logout():
     logout_user()
     flash("Você foi desconectado.")
     return redirect(url_for("auth.login"))
+
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -51,4 +56,3 @@ def register():
         return redirect(url_for("auth.login"))
     # Render the registration template (assuming it exists in static/)
     return render_template("register.html", title="Registrar", form=form)
-
